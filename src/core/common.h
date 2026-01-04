@@ -58,7 +58,8 @@
 #define ASSERT(condition, message) __ASSERT(condition, message)
 
 #define ASSERT_INDEX(index, size) \
-  ASSERT(index >= 0 && index < size, "Index out of bounds.")
+  ASSERT(!(0 - (ssize_t)(index) > 0) \
+    && (size_t)(index) < (size_t)(size), "Index out of bounds.")
 
 #define UNREACHABLE()                                                \
   do {                                                               \

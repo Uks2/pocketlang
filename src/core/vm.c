@@ -502,7 +502,7 @@ Var vmImportModule(PKVM* vm, String* from, String* path) {
 
   #ifndef PK_NO_DL
   bool isdl = _isPathDL(resolved);
-  if (isdl && vm->config.load_dl_fn == NULL
+  if ((isdl && vm->config.load_dl_fn == NULL)
       || vm->config.load_script_fn == NULL) {
   #else
   if (vm->config.load_script_fn == NULL) {
@@ -553,7 +553,7 @@ Var vmImportModule(PKVM* vm, String* from, String* path) {
 
 void vmEnsureStackSize(PKVM* vm, Fiber* fiber, int size) {
 
-  if (size >= (MAX_STACK_SIZE / sizeof(Var))) {
+  if ((unsigned) size >= (MAX_STACK_SIZE / sizeof(Var))) {
     VM_SET_ERROR(vm, newString(vm, "Maximum stack limit reached."));
     return;
   }
@@ -919,7 +919,8 @@ L_vm_main_loop:
 
     OPCODE(DUP):
     {
-      PUSH(*(fiber->sp - 1));
+      Var* sp = fiber->sp;
+      PUSH(*(sp - 1));
       DISPATCH();
     }
 

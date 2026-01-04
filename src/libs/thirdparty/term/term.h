@@ -497,6 +497,7 @@ static void _cleanup() {
 
 
 void _handle_resize(int sig) {
+  (void) sig;
   term_Vec newsize = _getsize();
   if (!_veceq(_ctx.screensize, newsize)) {
     return;
@@ -792,7 +793,7 @@ static bool _read_event(term_Event* event) {
 
 /* Returns the length of an escape sequence. */
 static int _escape_length(const char* buff, uint32_t size) {
-  int length = 0;
+  uint32_t length = 0;
 
   while (length < size) {
     char c = buff[length++];
@@ -843,6 +844,8 @@ static void _key_event(char c, term_Event* event) {
 /* Reference: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Mouse-Tracking */
 static void _mouse_event(const char* buff, uint32_t count, term_Event * event) {
 
+  (void) count;
+
   /* buff = cb ; cx ; cy m|M */
 
   const char* c = buff;
@@ -865,14 +868,14 @@ static void _mouse_event(const char* buff, uint32_t count, term_Event * event) {
    * next three bits = modifiers.
    * next bits = event type.
    */
-  int low = cb & 0b11;
-  int high = (cb & 0b11100) >> 2;
+  int low = cb & 0x3;
+  int high = (cb & 0x1C) >> 2;
   int type = cb >> 5;
 
   /* Note that the modifiers won't work/incorrect in WSL. */
-  if (high & 0b001) event->mouse.modifiers |= TERM_MD_SHIFT;
-  if (high & 0b010) event->mouse.modifiers |= TERM_MD_ALT;
-  if (high & 0b100) event->mouse.modifiers |= TERM_MD_CTRL;
+  if (high & 0x1) event->mouse.modifiers |= TERM_MD_SHIFT;
+  if (high & 0x2) event->mouse.modifiers |= TERM_MD_ALT;
+  if (high & 0x4) event->mouse.modifiers |= TERM_MD_CTRL;
 
   event->mouse.pos.x = cx - 1;
   event->mouse.pos.y = cy - 1;
@@ -884,7 +887,7 @@ static void _mouse_event(const char* buff, uint32_t count, term_Event * event) {
     } break;
 
     case 1: {
-      if (low == 0b11) {  /* Mouse move. */
+      if (low == 0x3) {  /* Mouse move. */
         event->type = TERM_ET_MOUSE_MOVE;
 
       } else { /* Drag. */
@@ -966,7 +969,7 @@ void _parse_escape_sequence(const char* buff, uint32_t count, term_Event* event)
 
 static void _buff_shift(uint32_t length) {
   assert(_ctx.buff != NULL);
-  if (length < _ctx.buffc) {
+  if ((int32_t)length < _ctx.buffc) {
     memmove(_ctx.buff, _ctx.buff + length, _ctx.buffc - length);
     _ctx.buffc -= length;
   } else {
@@ -988,8 +991,8 @@ static bool _read_event(term_Event* event) {
   int event_length = 1; /* Num of character for the event in the buffer. */
 
   if (*_ctx.buff == '\x1b') {
-    event_length = _escape_length(_ctx.buff + 1, _ctx.buffc - 1) + 1;
-    _parse_escape_sequence(_ctx.buff, event_length, event);
+    event_length = _escape_length((char*)_ctx.buff + 1, _ctx.buffc - 1) + 1;
+    _parse_escape_sequence((char*)_ctx.buff, event_length, event);
     if (event->type == TERM_ET_MOUSE_MOVE) {
       if (_veceq(_ctx.mousepos, event->mouse.pos)) {
         _buff_shift(event_length);

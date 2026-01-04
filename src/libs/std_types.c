@@ -73,7 +73,7 @@ DEF(_bytebuffFill,
   "types.ByteBuffer.fill(value:Number) -> Null",
   "Fill the buffer with the given byte value. Note that the value must be in "
   "between 0 and 0xff inclusive.") {
-  uint32_t n;
+  int32_t n;
   if (!pkValidateSlotInteger(vm, 1, &n)) return;
   if (n < 0x00 || n > 0xff) {
     pkSetRuntimeErrorFmt(vm, "Expected integer in range "
@@ -113,7 +113,7 @@ DEF(_bytebuffWrite,
       return;
 
     case PK_NUMBER: {
-      uint32_t i;
+      int32_t i;
       if (!pkValidateSlotInteger(vm, 1, &i)) return;
       if (i < 0x00 || i > 0xff) {
         pkSetRuntimeErrorFmt(vm, "Expected integer in range "
@@ -203,7 +203,7 @@ DEF(_bytebuffString,
   "types.ByteBuffer.string() -> String",
   "Returns the buffered values as String.") {
   pkByteBuffer* self = pkGetSelf(vm);
-  pkSetSlotStringLength(vm, 0, self->data, self->count);
+  pkSetSlotStringLength(vm, 0, (char*) self->data, self->count);
 }
 
 DEF(_bytebuffCount,

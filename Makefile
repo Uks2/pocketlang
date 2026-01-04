@@ -3,7 +3,7 @@
 ##  Distributed Under The MIT License
 
 CC             = gcc
-CFLAGS         = -fPIC
+CFLAGS         = -fPIC -Wall -Wextra -Werror
 DEBUG_CFLAGS   = -D DEBUG -g3 -Og
 RELEASE_CFLAGS = -g -O3
 LDFLAGS        = -lm -ldl

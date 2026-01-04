@@ -80,6 +80,44 @@ typedef struct PKVM PKVM;
 // till it's released with pkReleaseHandle().
 typedef struct PkHandle PkHandle;
 
+// Type enum of the pocketlang's first class types. Note that Object
+// isn't instanciable (as of now) but they're considered first calss.
+enum PkVarType {
+  PK_OBJECT = 0,
+
+  PK_NULL,
+  PK_BOOL,
+  PK_NUMBER,
+  PK_STRING,
+  PK_LIST,
+  PK_MAP,
+  PK_RANGE,
+  PK_MODULE,
+  PK_CLOSURE,
+  PK_METHOD_BIND,
+  PK_FIBER,
+  PK_CLASS,
+  PK_INSTANCE,
+};
+
+// Result that pocketlang will return after a compilation or running a
+// script or a function or evaluating an expression.
+enum PkResult {
+  PK_RESULT_SUCCESS = 0,    // Successfully finished the execution.
+
+  // Note that this result is internal and will not be returned to the host
+  // anymore.
+  //
+  // Unexpected EOF while compiling the source. This is another compile time
+  // error that will ONLY be returned if we're compiling in REPL mode. We need
+  // this specific error to indicate the host application to add another line
+  // to the last input. If REPL is not enabled this will be compile error.
+  PK_RESULT_UNEXPECTED_EOF,
+
+  PK_RESULT_COMPILE_ERROR,  // Compilation failed.
+  PK_RESULT_RUNTIME_ERROR,  // An error occurred at runtime.
+};
+
 typedef enum PkVarType PkVarType;
 typedef enum PkResult PkResult;
 typedef struct PkConfiguration PkConfiguration;
@@ -165,44 +203,6 @@ typedef void (*pkDeleteInstanceFn) (PKVM* vm, void*);
 /*****************************************************************************/
 /* POCKETLANG TYPES                                                          */
 /*****************************************************************************/
-
-// Type enum of the pocketlang's first class types. Note that Object isn't
-// instanciable (as of now) but they're considered first calss.
-enum PkVarType {
-  PK_OBJECT = 0,
-
-  PK_NULL,
-  PK_BOOL,
-  PK_NUMBER,
-  PK_STRING,
-  PK_LIST,
-  PK_MAP,
-  PK_RANGE,
-  PK_MODULE,
-  PK_CLOSURE,
-  PK_METHOD_BIND,
-  PK_FIBER,
-  PK_CLASS,
-  PK_INSTANCE,
-};
-
-// Result that pocketlang will return after a compilation or running a script
-// or a function or evaluating an expression.
-enum PkResult {
-  PK_RESULT_SUCCESS = 0,    // Successfully finished the execution.
-
-  // Note that this result is internal and will not be returned to the host
-  // anymore.
-  //
-  // Unexpected EOF while compiling the source. This is another compile time
-  // error that will ONLY be returned if we're compiling in REPL mode. We need
-  // this specific error to indicate the host application to add another line
-  // to the last input. If REPL is not enabled this will be compile error.
-  PK_RESULT_UNEXPECTED_EOF,
-
-  PK_RESULT_COMPILE_ERROR,  // Compilation failed.
-  PK_RESULT_RUNTIME_ERROR,  // An error occurred at runtime.
-};
 
 struct PkConfiguration {
 

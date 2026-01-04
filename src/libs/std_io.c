@@ -256,7 +256,7 @@ DEF(_fileRead,
     goto L_done;
   }
 
-  bool is_read_failed = read > count;
+  bool is_read_failed = (long) read > count;
   if (!is_read_failed) buff[read] = '\0';
 
   // If EOF is already reached it won't read anymore bytes.
@@ -329,7 +329,7 @@ DEF(_fileGetLine,
   } while (true);
 
   // A null byte '\0' will be added by pocketlang.
-  pkSetSlotStringLength(vm, 0, buff.data, buff.count);
+  pkSetSlotStringLength(vm, 0, (char*) buff.data, buff.count);
 
 L_done:
   pkByteBufferClear(&buff, vm);

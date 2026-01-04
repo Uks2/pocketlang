@@ -121,11 +121,7 @@ static inline bool validateCond(PKVM* vm, bool condition, const char* err) {
    }
  VALIDATE_ARG_OBJ(String, OBJ_STRING, "string")
  VALIDATE_ARG_OBJ(List, OBJ_LIST, "list")
- VALIDATE_ARG_OBJ(Map, OBJ_MAP, "map")
  VALIDATE_ARG_OBJ(Closure, OBJ_CLOSURE, "closure")
- VALIDATE_ARG_OBJ(Fiber, OBJ_FIBER, "fiber")
- VALIDATE_ARG_OBJ(Class, OBJ_CLASS, "class")
- VALIDATE_ARG_OBJ(Module, OBJ_MODULE, "module")
 
 /*****************************************************************************/
 /* SHARED FUNCTIONS                                                          */
@@ -401,6 +397,8 @@ DEF(coreDir,
       vmPopTempRef(vm); // list.
       RET(VAR_OBJ(list));
     } break;
+
+    default: break;
   }
 
   UNREACHABLE();
@@ -827,7 +825,7 @@ DEF(stdLangBackTrace,
   }
 
   // bb.count not including the null byte and which is the length.
-  String* bt = newStringLength(vm, bb.data, bb.count);
+  String* bt = newStringLength(vm, (char*)bb.data, bb.count);
   vmPushTempRef(vm, &bt->_super); // bt.
   pkByteBufferClear(&bb, vm);
   vmPopTempRef(vm); // bt.
@@ -1530,6 +1528,8 @@ Var preConstructSelf(PKVM* vm, Class* cls) {
 
     case PK_INSTANCE:
       return VAR_OBJ(newInstance(vm, cls));
+
+    default: break;
   }
 
   UNREACHABLE();
@@ -2293,7 +2293,8 @@ static String* _sliceString(PKVM* vm, String* str, Range* range) {
   }
 
   // Optimize case.
-  if (start == 0 && length == str->length && !reversed) return str;
+  if (start == 0 && (uint32_t) length == str->length &&
+      !reversed) return str;
 
   // TODO: check if length is 1 and return pre allocated character string.
 

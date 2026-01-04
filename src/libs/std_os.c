@@ -106,11 +106,13 @@ void osUnloadDL(PKVM* vm, void* handle) {
 #elif defined(__linux__)
 
 void* osLoadDL(PKVM* vm, const char* path) {
+  (void) vm;
   // https://man7.org/linux/man-pages/man3/dlopen.3.html
   void* handle = dlopen(path, RTLD_LAZY);
   if (handle == NULL) return NULL;
 
-  pkInitApiFn init_fn = dlsym(handle, PK_API_INIT_FN_NAME);
+  pkInitApiFn init_fn =
+    (pkInitApiFn) (unsigned long) dlsym(handle, PK_API_INIT_FN_NAME);
   if (init_fn == NULL) {
     if (dlclose(handle)) { /* TODO: Handle error. */ }
     dlerror(); // Clear error.
@@ -124,7 +126,8 @@ void* osLoadDL(PKVM* vm, const char* path) {
 }
 
 PkHandle* osImportDL(PKVM* vm, void* handle) {
-  pkExportModuleFn export_fn = dlsym(handle, PK_EXPORT_FN_NAME);
+  pkExportModuleFn export_fn =
+    (pkExportModuleFn) (long) dlsym(handle, PK_EXPORT_FN_NAME);
   if (export_fn == NULL) {
     dlerror(); // Clear error.
     return NULL;
@@ -136,6 +139,7 @@ PkHandle* osImportDL(PKVM* vm, void* handle) {
 }
 
 void osUnloadDL(PKVM* vm, void* handle) {
+  (void) vm;
   dlclose(handle);
 }
 

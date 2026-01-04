@@ -181,6 +181,7 @@ PKDEF(_termInit,
 PKDEF(_termCleanup,
   "term.cleanup() -> Null",
   "Cleanup and resotre the last terminal state.") {
+  (void) vm;
   term_cleanup();
 }
 
@@ -193,6 +194,7 @@ PKDEF(_termIsatty,
 PKDEF(_termNewScreenBuffer,
   "term.new_screen_buffer() -> Null",
   "Switch to an alternative screen buffer.") {
+  (void) vm;
   term_new_screen_buffer();
 }
 
@@ -200,6 +202,7 @@ PKDEF(_termRestoreScreenBuffer,
   "term.restore_screen_buffer() -> Null",
   "Restore the alternative buffer which was created with "
   "term.new_screen_buffer()") {
+  (void) vm;
   term_restore_screen_buffer();
 }
 
@@ -260,6 +263,7 @@ PKDEF(_termBinaryMode,
   "term.binary_mode() -> Null",
   "On windows it'll set stdout to binary mode, on other platforms this "
   "function won't make make any difference.") {
+  (void) vm;
   #ifdef _WIN32
     (void) _setmode(_fileno(stdout), _O_BINARY);
   #endif
@@ -290,7 +294,7 @@ void registerModuleTerm(PKVM* vm) {
 
   ADD_METHOD(_cls_term_event, "@getter", _termEventGetter, 1);
 
-  pkModuleAddSource(vm, term, ext_term_pk);
+  pkModuleAddSource(vm, term, (char*) ext_term_pk);
 
   // This is required for language server. Since we need to send '\r\n' to
   // the lsp client but windows will change '\n' to '\r\n' and it'll become

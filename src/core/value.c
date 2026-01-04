@@ -52,7 +52,8 @@ void pkByteBufferAddStringFmt(pkByteBuffer* self, PKVM* vm,
   va_end(copy);
 
   pkByteBufferReserve(self, vm, self->count + (size_t) length + 1);
-  vsnprintf(self->data + self->count, self->capacity - self->count, fmt, args);
+  vsnprintf((char*) self->data + self->count,
+    self->capacity - self->count, fmt, args);
   self->count += length;
   va_end(args);
 }
@@ -1580,9 +1581,7 @@ static void _toStringInternal(PKVM* vm, const Var v, pkByteBuffer* buff,
               case '\t': pkByteBufferAddString(buff, vm, "\\t", 2); break;
 
               default: {
-                // if c isn't in range 0x00 to 0xff, isprintc()
-                // fail an assertion.
-                if ((0x00 <= c && c <= 0xff) && isprint(c)) {
+                if (isprint(c & 0xFF)) {
                   pkByteBufferWrite(buff, vm, c);
                 } else {
                   pkByteBufferAddString(buff, vm, "\\x", 2);
