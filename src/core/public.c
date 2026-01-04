@@ -173,6 +173,14 @@ void pkFreeVM(PKVM* vm) {
 
   // Tell the host application that it forget to release all of it's handles
   // before freeing the VM.
+  if ( NULL != vm->handles ) {
+    PkHandle* handle = vm->handles;
+    do {
+      fprintf( stderr, "Handle from %s:%u still allocated\n",
+        handle->file, handle->line );
+      handle = handle->next;
+    } while ( NULL != handle && vm->handles != handle );
+  }
   ASSERT(vm->handles == NULL, "Not all handles were released.");
 
   DEALLOCATE(vm, vm, PKVM);
@@ -226,12 +234,12 @@ void pkAddSearchPath(PKVM* vm, const char* path) {
   vmPopTempRef(vm); // spath.
 }
 
-PkHandle* pkNewModule(PKVM* vm, const char* name) {
+PkHandle* pkNewModule_(PKVM* vm, const char* name, const char* f, int l) {
   CHECK_ARG_NULL(name);
   Module* module = newModuleInternal(vm, name);
 
   vmPushTempRef(vm, &module->_super); // module.
-  PkHandle* handle = vmNewHandle(vm, VAR_OBJ(module));
+  PkHandle* handle = vmNewHandle(vm, VAR_OBJ(module), f, l);
   vmPopTempRef(vm); // module.
 
   return handle;
@@ -253,11 +261,11 @@ void pkModuleAddFunction(PKVM* vm, PkHandle* module, const char* name,
                             name, fptr, arity, docstring);
 }
 
-PkHandle* pkNewClass(PKVM* vm, const char* name,
+PkHandle* pkNewClass_(PKVM* vm, const char* name,
                      PkHandle* base_class, PkHandle* module,
                      pkNewInstanceFn new_fn,
                      pkDeleteInstanceFn delete_fn,
-                     const char* docstring) {
+                     const char* docstring, const char* f, int l) {
   CHECK_ARG_NULL(module);
   CHECK_ARG_NULL(name);
   CHECK_HANDLE_TYPE(module, OBJ_MODULE);
@@ -275,7 +283,7 @@ PkHandle* pkNewClass(PKVM* vm, const char* name,
   class_->delete_fn = delete_fn;
 
   vmPushTempRef(vm, &class_->_super); // class_.
-  PkHandle* handle = vmNewHandle(vm, VAR_OBJ(class_));
+  PkHandle* handle = vmNewHandle(vm, VAR_OBJ(class_), f, l);
   vmPopTempRef(vm); // class_.
   return handle;
 }
@@ -760,10 +768,10 @@ const char* pkGetSlotString(PKVM* vm, int index, uint32_t* length) {
   return ((String*)AS_OBJ(value))->data;
 }
 
-PkHandle* pkGetSlotHandle(PKVM* vm, int index) {
+PkHandle* pkGetSlotHandle_(PKVM* vm, int index, const char* f, int l) {
   CHECK_FIBER_EXISTS(vm);
   VALIDATE_SLOT_INDEX(index);
-  return vmNewHandle(vm, SLOT(index));
+  return vmNewHandle(vm, SLOT(index), f, l);
 }
 
 void* pkGetSlotNativeInstance(PKVM* vm, int index) {

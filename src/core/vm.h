@@ -51,7 +51,8 @@
 // Handles are wrapper around Var that lives on the host application.
 struct PkHandle {
   Var value;
-
+  const char* file;
+  int line;
   PkHandle* prev;
   PkHandle* next;
 };
@@ -146,7 +147,7 @@ struct PKVM {
 void* vmRealloc(PKVM* vm, void* memory, size_t old_size, size_t new_size);
 
 // Create and return a new handle for the [value].
-PkHandle* vmNewHandle(PKVM* vm, Var value);
+PkHandle* vmNewHandle(PKVM* vm, Var value, const char* f, int l);
 
 // If the stack size is less than [size], the stack will grow to keep more
 // values on it.

@@ -12,9 +12,11 @@
 #include "debug.h"
 #endif
 
-PkHandle* vmNewHandle(PKVM* vm, Var value) {
+PkHandle* vmNewHandle(PKVM* vm, Var value, const char* f, int l) {
   PkHandle* handle = (PkHandle*)ALLOCATE(vm, PkHandle);
   handle->value = value;
+  handle->file = f;
+  handle->line = l;
   handle->prev = NULL;
   handle->next = vm->handles;
   if (handle->next != NULL) handle->next->prev = handle;

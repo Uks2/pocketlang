@@ -279,7 +279,10 @@ PK_PUBLIC void pkReleaseHandle(PKVM* vm, PkHandle* handle);
 
 // Add a new module named [name] to the [vm]. Note that the module shouldn't
 // already existed, otherwise an assertion will fail to indicate that.
-PK_PUBLIC PkHandle* pkNewModule(PKVM* vm, const char* name);
+#define pkNewModule( vm, name ) \
+	pkNewModule_( vm, name, __FILE__, __LINE__ );
+PK_PUBLIC PkHandle* pkNewModule_(PKVM* vm, const char* name,
+	const char* f, int l);
 
 // Register the module to the PKVM's modules map, once after it can be
 // imported in other modules.
@@ -297,11 +300,15 @@ PK_PUBLIC void pkModuleAddFunction(PKVM* vm, PkHandle* module,
 // Create a new class on the [module] with the [name] and return it.
 // If the [base_class] is NULL by default it'll set to "Object" class.
 // [docstring] is optional and could be omitted with NULL.
-PK_PUBLIC PkHandle* pkNewClass(PKVM* vm, const char* name,
+#define pkNewClass(vm, name, base_class, module, \
+		new_fn, delete_fn, docstring) \
+	pkNewClass_(vm, name, base_class, module, \
+		new_fn, delete_fn, docstring, __FILE__, __LINE__ )
+PK_PUBLIC PkHandle* pkNewClass_(PKVM* vm, const char* name,
                                PkHandle* base_class, PkHandle* module,
                                pkNewInstanceFn new_fn,
                                pkDeleteInstanceFn delete_fn,
-                               const char* docstring);
+                               const char* docstring, const char* f, int l);
 
 // Add a native method to the given class. If the [arity] is -1 that means
 // the method has variadic parameters and use pkGetArgc() to get the argc.
@@ -412,7 +419,10 @@ PK_PUBLIC const char* pkGetSlotString(PKVM* vm, int index, uint32_t* length);
 // Capture the variable at the [index] slot and return its handle. As long as
 // the handle is not released with `pkReleaseHandle()` the variable won't be
 // garbage collected.
-PK_PUBLIC PkHandle* pkGetSlotHandle(PKVM* vm, int index);
+#define pkGetSlotHandle( vm, index) \
+	pkGetSlotHandle_( vm, index, __FILE__, __LINE__ )
+PK_PUBLIC PkHandle* pkGetSlotHandle_(
+	PKVM* vm, int index, const char* f, int l);
 
 // Returns the native instance at the [index] slot. If the value at the [index]
 // is not a valid native instance, an assertion will fail.
