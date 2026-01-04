@@ -337,31 +337,34 @@ struct Function {
   Module* owner;
 
   // FIXME:
-  // Because of the builtin function cannot have modules, we cannot reference
-  // the name of a function with a index which points to the name entry in the
-  // owner module's names buffer.
+  // Because of the builtin function cannot have modules, we cannot
+  // reference the name of a function with a index which points to the
+  // name entry in the owner module's names buffer.
   //
-  // The [name] is the name of the function which the function won't have a
-  // reference to that (to prevent it from garbage collected), it's either
-  // a C literal string or a name entry in the owner modules names buffer.
-  // Either way it's guranteed to be alive till the function is alive.
+  // The [name] is the name of the function which the function won't
+  // have a reference to that (to prevent it from garbage collected),
+  // it's either a C literal string or a name entry in the owner modules
+  // names buffer.  Either way it's guranteed to be alive till the
+  // function is alive.
   //
-  // For embedding pocketlang the user must ensure the name exists till the
-  // function is alive, and it's recomented to use literal C string for that.
+  // For embedding pocketlang the user must ensure the name exists till
+  // the function is alive, and it's recomented to use literal C string
+  // for that.
   const char* name;
 
-  // Number of argument the function expects. If the arity is -1 that means
-  // the function has a variadic number of parameters. When a function is
-  // constructed the value for arity is set to -2 to indicate that it hasn't
-  // initialized.
+  // Number of argument the function expects. If the arity is -1 that
+  // means the function has a variadic number of parameters. When a
+  // function is constructed the value for arity is set to -2 to
+  // indicate that it hasn't initialized.
   int arity;
 
-  // A function can be either a function or a method, and if it's a method, it
-  // cannot directly invoked without an instance.
+  // A function can be either a function or a method, and if it's a
+  // method, it cannot directly invoked without an instance.
   bool is_method;
 
-  // Number of upvalues it uses, we're defining it here (and not in object Fn)
-  // is prevent checking is_native everytime (which might be a bit faster).
+  // Number of upvalues it uses, we're defining it here (and not in
+  // object Fn) is prevent checking is_native everytime (which might be
+  // a bit faster).
   int upvalue_count;
 
   // Docstring of the function. Could be either a C string literal or a string

@@ -408,9 +408,9 @@ void vmUnloadDlHandle(PKVM* vm, void* handle) {
 }
 #endif // PK_NO_DL
 
-/*****************************************************************************/
-/* VM INTERNALS                                                              */
-/*****************************************************************************/
+/**********************************************************************/
+/* VM INTERNALS                                                       */
+/**********************************************************************/
 
 static Module* _importScript(PKVM* vm, String* resolved, String* name) {
   char* source = vm->config.load_script_fn(vm, resolved->data);
@@ -777,7 +777,8 @@ PkResult vmRunFiber(PKVM* vm, Fiber* fiber_) {
   // collected, if protected with vmPushTempRef() by the caller otherwise.
   vm->fiber = fiber_;
 
-  ASSERT(fiber_->state == FIBER_NEW || fiber_->state == FIBER_YIELDED, OOPS);
+  ASSERT(fiber_->state == FIBER_NEW || fiber_->state == FIBER_YIELDED,
+    OOPS);
   fiber_->state = FIBER_RUNNING;
 
   // The instruction pointer.
@@ -790,11 +791,12 @@ PkResult vmRunFiber(PKVM* vm, Fiber* fiber_) {
   register Fiber* fiber = fiber_;
 
 #if DEBUG
-  #define PUSH(value)                                                       \
-  do {                                                                      \
-    ASSERT(fiber->sp < (fiber->stack + ((intptr_t) fiber->stack_size - 1)), \
-           OOPS);                                                           \
-    (*fiber->sp++ = (value));                                               \
+  #define PUSH(value)                                                  \
+  do {                                                                 \
+    ASSERT(fiber->sp <                                                 \
+        (fiber->stack + ((intptr_t) fiber->stack_size - 1)),           \
+      OOPS);                                                           \
+    (*fiber->sp++ = (value));                                          \
   } while (false)
 #else
   #define PUSH(value)  (*fiber->sp++ = (value))
@@ -857,7 +859,8 @@ PkResult vmRunFiber(PKVM* vm, Fiber* fiber_) {
   #error "OPCODE" should not be deifined here.
 #endif
 
-#define SWITCH() Opcode instruction; switch (instruction = (Opcode)READ_BYTE())
+#define SWITCH() Opcode instruction; \
+    switch (instruction = (Opcode)READ_BYTE())
 #define OPCODE(code) case OP_##code
 #define DISPATCH()   goto L_vm_main_loop
 

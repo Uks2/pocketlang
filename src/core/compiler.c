@@ -47,9 +47,9 @@
 // Max number of break statement in a loop statement to patch.
 #define MAX_BREAK_PATCH 256
 
-/*****************************************************************************/
-/* TOKENS                                                                    */
-/*****************************************************************************/
+/**********************************************************************/
+/* TOKENS                                                             */
+/**********************************************************************/
 
 typedef enum {
 
@@ -210,9 +210,9 @@ static _Keyword _keywords[] = {
   { NULL,       0, (_TokenType)(0) }, // Sentinel to mark the end of the array.
 };
 
-/*****************************************************************************/
-/* COMPILER INTERNAL TYPES                                                   */
-/*****************************************************************************/
+/**********************************************************************/
+/* COMPILER INTERNAL                                                  */
+/**********************************************************************/
 
 // Precedence parsing references:
 // http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
@@ -508,9 +508,9 @@ static OpInfo opcode_info[] = {
   #undef OPCODE
 };
 
-/*****************************************************************************/
-/* INITALIZATION FUNCTIONS                                                   */
-/*****************************************************************************/
+/**********************************************************************/
+/* INITALIZATION FUNCTIONS                                            */
+/**********************************************************************/
 
 // FIXME:
 // This forward declaration can be removed once the interpolated string's
@@ -588,9 +588,9 @@ static void compilerInit(Compiler* compiler, PKVM* vm, const char* source,
   ASSERT(compiler->bifn_list_join >= 0, OOPS);
 }
 
-/*****************************************************************************/
-/* ERROR HANDLERS                                                            */
-/*****************************************************************************/
+/**********************************************************************/
+/* ERROR HANDLERS                                                     */
+/**********************************************************************/
 
 // Internal error report function for lexing and parsing.
 static void reportError(Parser* parser, Token tk,
@@ -662,9 +662,9 @@ static void checkMaxConstantsReached(Compiler* compiler, int index) {
   }
 }
 
-/*****************************************************************************/
-/* LEXING                                                                    */
-/*****************************************************************************/
+/**********************************************************************/
+/* LEXING                                                             */
+/**********************************************************************/
 
 // Forward declaration of lexer methods.
 
@@ -1220,9 +1220,9 @@ static void lexToken(Compiler* compiler) {
   setNextToken(parser, TK_EOF);
 }
 
-/*****************************************************************************/
-/* PARSING                                                                   */
-/*****************************************************************************/
+/**********************************************************************/
+/* PARSING                                                            */
+/**********************************************************************/
 
 // Returns current token type without lexing a new token.
 static _TokenType peek(Compiler* compiler) {
@@ -1353,9 +1353,9 @@ static bool matchAssignment(Compiler* compiler) {
   return false;
 }
 
-/*****************************************************************************/
-/* NAME SEARCH (AT COMPILATION PHASE)                                        */
-/*****************************************************************************/
+/**********************************************************************/
+/* NAME SEARCH (AT COMPILATION PHASE)                                 */
+/**********************************************************************/
 
 // Find the builtin function name and returns it's index in the builtins array
 // if not found returns -1.
@@ -1531,9 +1531,9 @@ static NameSearchResult compilerSearchName(Compiler* compiler,
   return result;
 }
 
-/*****************************************************************************/
-/* PARSING GRAMMAR                                                           */
-/*****************************************************************************/
+/**********************************************************************/
+/* PARSING GRAMMAR                                                    */
+/**********************************************************************/
 
 // Forward declaration of codegen functions.
 static void emitOpcode(Compiler* compiler, Opcode opcode);
@@ -2341,9 +2341,9 @@ static void parsePrecedence(Compiler* compiler, Precedence precedence) {
   compiler->can_define = can_define;
 }
 
-/*****************************************************************************/
-/* COMPILING                                                                 */
-/*****************************************************************************/
+/**********************************************************************/
+/* COMPILING                                                          */
+/**********************************************************************/
 
 // Add a variable and return it's index to the context. Assumes that the
 // variable name is unique and not defined before in the current scope.
@@ -2488,9 +2488,9 @@ static void compilerPopFunc(Compiler* compiler) {
   compiler->func = compiler->func->outer_func;
 }
 
-/*****************************************************************************/
-/* COMPILING (EMIT BYTECODE)                                                 */
-/*****************************************************************************/
+/**********************************************************************/
+/* COMPILING (EMIT BYTECODE)                                          */
+/**********************************************************************/
 
 // Emit a single byte and return it's index.
 static int emitByte(Compiler* compiler, int byte) {
@@ -2580,9 +2580,9 @@ static void patchForward(Compiler* compiler, Fn* fn, int index, int name) {
   fn->opcodes.data[index] = name & 0xff;
 }
 
-/*****************************************************************************/
-/* COMPILING (PARSE TOPLEVEL)                                                */
-/*****************************************************************************/
+/**********************************************************************/
+/* COMPILING (PARSE TOPLEVEL)                                         */
+/**********************************************************************/
 
 typedef enum {
   BLOCK_FUNC,
@@ -2747,10 +2747,10 @@ static bool matchOperatorMethod(Compiler* compiler,
 #undef _RET
 }
 
-// Compile a function, if it's a literal function after this call a closure of
-// the function will be at the stack top, toplevel functions will be assigned
-// to a global variable and popped, and methods will be bind to the class and
-// popped.
+// Compile a function, if it's a literal function after this call a
+// closure of the function will be at the stack top, toplevel functions
+// will be assigned to a global variable and popped, and methods will be
+// bind to the class and popped.
 static void compileFunction(Compiler* compiler, FuncType fn_type) {
 
   const char* name = "(?)"; // Setting "(?)" in case of syntax errors.

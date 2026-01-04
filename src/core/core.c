@@ -35,9 +35,9 @@
     RET(VAR_NULL);             \
   } while(false)
 
-/*****************************************************************************/
-/* VALIDATORS                                                                */
-/*****************************************************************************/
+/**********************************************************************/
+/* VALIDATORS                                                         */
+/**********************************************************************/
 
 // Check if [var] is a numeric value (bool/number) and set [value].
 static inline bool isNumeric(Var var, double* value) {
@@ -106,26 +106,27 @@ static inline bool validateCond(PKVM* vm, bool condition, const char* err) {
 
 // Check if [var] is string for argument at [arg]. If not set error and
 // return false.
-#define VALIDATE_ARG_OBJ(m_class, m_type, m_name)                            \
-  static bool validateArg##m_class(PKVM* vm, int arg, m_class** value) {     \
-    Var var = ARG(arg);                                                      \
-    ASSERT(arg > 0 && arg <= ARGC, OOPS);                                    \
-    if (!IS_OBJ(var) || AS_OBJ(var)->type != m_type) {                       \
-      char buff[12]; sprintf(buff, "%d", arg);                               \
-      VM_SET_ERROR(vm, stringFormat(vm, "Expected a " m_name                 \
-                   " at argument $.", buff, false));                         \
-      return false;                                                          \
-    }                                                                        \
-    *value = (m_class*)AS_OBJ(var);                                          \
-    return true;                                                             \
+#define VALIDATE_ARG_OBJ(m_class, m_type, m_name)                      \
+  static bool validateArg##m_class(                                    \
+      PKVM* vm, int arg, m_class** value) {                            \
+    Var var = ARG(arg);                                                \
+    ASSERT(arg > 0 && arg <= ARGC, OOPS);                              \
+    if (!IS_OBJ(var) || AS_OBJ(var)->type != m_type) {                 \
+      char buff[12]; sprintf(buff, "%d", arg);                         \
+      VM_SET_ERROR(vm, stringFormat(vm, "Expected a " m_name           \
+                   " at argument $.", buff, false));                   \
+      return false;                                                    \
+    }                                                                  \
+    *value = (m_class*)AS_OBJ(var);                                    \
+    return true;                                                       \
    }
  VALIDATE_ARG_OBJ(String, OBJ_STRING, "string")
  VALIDATE_ARG_OBJ(List, OBJ_LIST, "list")
  VALIDATE_ARG_OBJ(Closure, OBJ_CLOSURE, "closure")
 
-/*****************************************************************************/
-/* SHARED FUNCTIONS                                                          */
-/*****************************************************************************/
+/**********************************************************************/
+/* SHARED FUNCTIONS                                                   */
+/**********************************************************************/
 
 static void initializeBuiltinFunctions(PKVM* vm);
 static void initializeCoreModules(PKVM* vm);
@@ -166,9 +167,9 @@ void initializeModule(PKVM* vm, Module* module, bool is_main) {
   if (is_main) vmPopTempRef(vm); // _main.
 }
 
-/*****************************************************************************/
-/* INTERNAL FUNCTIONS                                                        */
-/*****************************************************************************/
+/**********************************************************************/
+/* INTERNAL FUNCTIONS                                                 */
+/**********************************************************************/
 
 String* varToString(PKVM* vm, Var self, bool repr) {
   if (IS_OBJ_TYPE(self, OBJ_INST)) {
@@ -249,9 +250,9 @@ static inline bool _callBinaryOpMethod(PKVM* vm, Var self, Var other,
   return true;
 }
 
-/*****************************************************************************/
-/* REFLECTION AND HELPER FUNCTIONS                                           */
-/*****************************************************************************/
+/**********************************************************************/
+/* REFLECTION AND HELPER FUNCTIONS                                    */
+/**********************************************************************/
 
 // Add all the methods recursively to the lits used for generating a list of
 // attributes for the 'dir()' function.
@@ -265,9 +266,9 @@ static void _collectMethods(PKVM* vm, List* list, Class* cls) {
   _collectMethods(vm, list, cls->super_class);
 }
 
-/*****************************************************************************/
-/* CORE BUILTIN FUNCTIONS                                                    */
-/*****************************************************************************/
+/**********************************************************************/
+/* CORE BUILTIN FUNCTIONS                                             */
+/**********************************************************************/
 
 DEF(coreHelp,
   "help([value:Closure|MethodBind|Class]) -> Null",
@@ -715,9 +716,9 @@ static void initializeBuiltinFunctions(PKVM* vm) {
 #undef INITIALIZE_BUILTIN_FN
 }
 
-/*****************************************************************************/
-/* CORE MODULE METHODS                                                       */
-/*****************************************************************************/
+/**********************************************************************/
+/* CORE MODULE METHODS                                                */
+/**********************************************************************/
 
 // Create a module and add it to the vm's core modules, returns the module.
 Module* newModuleInternal(PKVM* vm, const char* name) {
@@ -887,9 +888,9 @@ static void initializeCoreModules(PKVM* vm) {
 #undef NEW_MODULE
 }
 
-/*****************************************************************************/
-/* BUILTIN CLASS CONSTRUCTORS                                                */
-/*****************************************************************************/
+/**********************************************************************/
+/* BUILTIN CLASS CONSTRUCTORS                                         */
+/**********************************************************************/
 
 static void _ctorNull(PKVM* vm) {
   RET(VAR_NULL);
@@ -956,9 +957,9 @@ static void _ctorFiber(PKVM* vm) {
   RET(VAR_OBJ(newFiber(vm, closure)));
 }
 
-/*****************************************************************************/
-/* BUILTIN CLASS METHODS                                                     */
-/*****************************************************************************/
+/**********************************************************************/
+/* BUILTIN CLASS METHODS                                              */
+/**********************************************************************/
 
 #define SELF (vm->fiber->self)
 
@@ -1398,9 +1399,9 @@ DEF(_fiberResume,
 
 #undef SELF
 
-/*****************************************************************************/
-/* BUILTIN CLASS INITIALIZATION                                              */
-/*****************************************************************************/
+/**********************************************************************/
+/* BUILTIN CLASS INITIALIZATION                                       */
+/**********************************************************************/
 
 static void initializePrimitiveClasses(PKVM* vm) {
   for (int i = 0; i < PK_INSTANCE; i++) {
@@ -1487,9 +1488,9 @@ static void initializePrimitiveClasses(PKVM* vm) {
 #undef ADD_METHOD
 }
 
-/*****************************************************************************/
-/* OPERATORS                                                                 */
-/*****************************************************************************/
+/**********************************************************************/
+/* OPERATORS                                                          */
+/**********************************************************************/
 
 Var preConstructSelf(PKVM* vm, Class* cls) {
 

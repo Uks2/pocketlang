@@ -37,9 +37,9 @@
 #define ADD_METHOD(cls, name, fn, argc) \
   pkClassAddMethod(vm, cls, name, fn, argc, PK_DOCS(fn));
 
-/*****************************************************************************/
-/* SHARED FUNCTIONS                                                          */
-/*****************************************************************************/
+/**********************************************************************/
+/* SHARED FUNCTIONS                                                   */
+/**********************************************************************/
 
 // These are "public" module functions that can be shared. Since each source
 // files in this modules doesn't have their own headers we're using this as

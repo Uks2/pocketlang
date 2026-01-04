@@ -65,9 +65,9 @@ void moduleAddFunctionInternal(PKVM* vm, Module* module,
                                const char* name, pkNativeFn fptr,
                                int arity, const char* docstring);
 
-/*****************************************************************************/
-/* OPERATORS                                                                 */
-/*****************************************************************************/
+/**********************************************************************/
+/* OPERATORS                                                          */
+/**********************************************************************/
 
 // This method is called just before constructing a type to initialize self
 // and after that the constructor will be called. For builtin types this
