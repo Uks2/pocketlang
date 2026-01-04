@@ -900,6 +900,31 @@ bool pkNewInstance(PKVM* vm, int cls, int index, int argc, int argv) {
   return !VM_HAS_ERROR(vm);
 }
 
+bool pkCreateInstance( PKVM* vm, int cls, int index, void* data ) {
+
+  CHECK_FIBER_EXISTS(vm);
+  VALIDATE_SLOT_INDEX(index);
+  ASSERT(IS_OBJ_TYPE(SLOT(cls), OBJ_CLASS), "Slot value wasn't a class.");
+  ASSERT(( (Class*) AS_OBJ( SLOT( cls ) ) )->class_of == PK_INSTANCE,
+    "Cannot create an instace of builtin "
+    "class with newInstance() function.");
+
+  Instance* inst = ALLOCATE(vm, Instance);
+  memset(inst, 0, sizeof(Instance));
+  varInitObject(&inst->_super, vm, OBJ_INST);
+
+  inst->cls = (Class*) AS_OBJ( SLOT( cls ) );
+  ASSERT( ( (Class*) AS_OBJ( SLOT( cls ) ) )->new_fn,
+    "pkCreateInstance is only for native classes" );
+  inst->native = data;
+
+  inst->attribs = newMap(vm);
+
+  SET_SLOT( index, VAR_OBJ( inst ) );
+  return !VM_HAS_ERROR(vm);
+
+}
+
 void pkNewRange(PKVM* vm, int index, double first, double last) {
   CHECK_FIBER_EXISTS(vm);
   VALIDATE_SLOT_INDEX(index);
@@ -958,6 +983,25 @@ bool pkListPop(PKVM* vm, int list, int32_t index, int popped) {
   return true;
 }
 
+bool pkListGet(PKVM* vm, int list, int32_t index, int value) {
+  CHECK_FIBER_EXISTS(vm);
+  VALIDATE_SLOT_INDEX(list);
+  if (value >= 0) VALIDATE_SLOT_INDEX(value);
+
+  ASSERT(IS_OBJ_TYPE(SLOT(list), OBJ_LIST), "Slot value wasn't a List");
+  List* l = (List*) AS_OBJ(SLOT(list));
+  if (index < 0) index += l->elements.count;
+
+  if (index < 0 || (uint32_t) index >= l->elements.count) {
+    VM_SET_ERROR(vm, newString(vm, "Index out of bounds."));
+    return false;
+  }
+
+  Var p = l->elements.data[index];
+  if (value >= 0) SET_SLOT(value, p);
+  return true;
+}
+
 uint32_t pkListLength(PKVM* vm, int list) {
   CHECK_FIBER_EXISTS(vm);
   VALIDATE_SLOT_INDEX(list);
@@ -966,6 +1010,42 @@ uint32_t pkListLength(PKVM* vm, int list) {
   List* l = (List*)AS_OBJ(SLOT(list));
 
   return l->elements.count;
+}
+
+bool pkMapSet( PKVM* vm, int map, int key, int value ) {
+
+  CHECK_FIBER_EXISTS( vm );
+  VALIDATE_SLOT_INDEX( map );
+  VALIDATE_SLOT_INDEX( key );
+  VALIDATE_SLOT_INDEX( value );
+
+  mapSet( vm, AS_MAP( SLOT( map ) ), SLOT( key ), SLOT( value ) );
+
+  return !VM_HAS_ERROR( vm );
+
+}
+
+bool pkMapContains( PKVM* vm, int map, int key ) {
+
+  CHECK_FIBER_EXISTS( vm );
+  VALIDATE_SLOT_INDEX( map );
+  VALIDATE_SLOT_INDEX( key );
+
+  return VAR_UNDEFINED != mapGet( AS_MAP( SLOT( map ) ), SLOT( key ) );
+
+}
+
+bool pkMapGet( PKVM* vm, int map, int key, int value ) {
+
+  CHECK_FIBER_EXISTS( vm );
+  VALIDATE_SLOT_INDEX( map );
+  VALIDATE_SLOT_INDEX( key );
+  VALIDATE_SLOT_INDEX( value );
+
+  SET_SLOT( value, mapGet( AS_MAP( SLOT( map ) ), SLOT( key ) ) );
+
+  return VAR_UNDEFINED != SLOT( value );
+
 }
 
 bool pkCallFunction(PKVM* vm, int fn, int argc, int argv, int ret) {

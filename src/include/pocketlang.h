@@ -485,9 +485,21 @@ PK_PUBLIC bool pkListInsert(PKVM* vm, int list, int32_t index, int value);
 // [popped] is negative, the popped value will be ignored.
 PK_PUBLIC bool pkListPop(PKVM* vm, int list, int32_t index, int popped);
 
+// Get an element from [list] at [index] and place it at the [value] slot.
+PK_PUBLIC bool pkListGet(PKVM* vm, int list, int32_t index, int value);
+
 // Returns the length of the list at the [list] slot, it the slot isn't a list
 // an assertion will fail.
 PK_PUBLIC uint32_t pkListLength(PKVM* vm, int list);
+
+// Insert [value] into the [map] with the given [key]
+PK_PUBLIC bool pkMapSet( PKVM* vm, int map, int key, int value );
+
+// Return true if [map] contains [key]
+PK_PUBLIC bool pkMapContains( PKVM* vm, int map, int key );
+
+// Fill slot [value] with the entry at [key] in [map]
+PK_PUBLIC bool pkMapGet( PKVM* vm, int map, int key, int value );
 
 // Calls a function at the [fn] slot, with [argc] argument where [argv] is the
 // slot of the first argument. [ret] is the slot index of the return value. if
